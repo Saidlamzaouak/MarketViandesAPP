@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MarketViandes — maquette de l'application client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bench:#E7EAEC; --bench-2:#DDE1E4; --panel:#FFFFFF; --ink:#15181B; --muted:#6B767D;
+  --line:#DCE1E4; --line-soft:#EDF0F2;
+  --accent:#A3122B; --accent-ink:#FFFFFF; --accent-soft:#FAEBEE;
+  --cold:#1F6C8C; --cold-soft:#E8F2F6; --ok:#146B52; --ok-soft:#E7F3EF;
+  --warn:#8A5B12; --warn-soft:#FBF1E0;
+  --shadow:0 18px 50px rgba(20,30,38,.18); --radius:14px;
+  --font-display:"Bricolage Grotesque",Georgia,serif;
+  --font-ui:"Inter","Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bench:#121618; --bench-2:#0D1113; --panel:#1A1F22; --ink:#E9EEF0; --muted:#98A5AC;
+    --line:#2B3237; --line-soft:#232A2E; --accent:#D8425C; --accent-ink:#1A1F22; --accent-soft:#2A1B20;
+    --cold:#6FB6D4; --cold-soft:#17272E; --ok:#5FC2A2; --ok-soft:#14261F; --warn:#D9A74E; --warn-soft:#272011;
+    --shadow:0 18px 50px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bench:#121618; --bench-2:#0D1113; --panel:#1A1F22; --ink:#E9EEF0; --muted:#98A5AC;
+  --line:#2B3237; --line-soft:#232A2E; --accent:#D8425C; --accent-ink:#1A1F22; --accent-soft:#2A1B20;
+  --cold:#6FB6D4; --cold-soft:#17272E; --ok:#5FC2A2; --ok-soft:#14261F; --warn:#D9A74E; --warn-soft:#272011;
+  --shadow:0 18px 50px rgba(0,0,0,.5);
+}
+html[lang="ar"]{ --font-ui:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif; --font-display:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif; }
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bench);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+html[lang="ar"] body{line-height:1.7}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+.bench{display:grid;grid-template-columns:330px minmax(0,1fr);min-height:100vh}
+.rail{background:var(--bench-2);border-inline-end:1px solid var(--line);padding:26px 24px 40px;display:flex;flex-direction:column;gap:20px}
+.brandmark{display:flex;align-items:baseline;gap:9px}
+.brandmark b{font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em}
+.brandmark span{font-size:12px;color:var(--muted)}
+.rail h1{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.25;margin:0;letter-spacing:-.02em;max-width:26ch}
+.rail p.lead{margin:0;color:var(--muted);font-size:13.5px;max-width:36ch}
+.langpick{display:flex;gap:7px}
+.langpick button{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px;font-size:13px;color:var(--muted);background:var(--panel)}
+.langpick button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink);font-weight:600}
+.screens{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.screens button{text-align:start;padding:10px 13px;background:var(--panel);font-size:13.5px;display:flex;align-items:center;gap:10px;color:var(--muted)}
+.screens button b{font-weight:500;color:var(--ink)}
+.screens button i{font-style:normal;font-size:11px;width:18px;color:var(--muted);font-variant-numeric:tabular-nums}
+.screens button[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
+.screens button[aria-current="true"] b,.screens button[aria-current="true"] i{color:var(--accent-ink)}
+.note{border-inline-start:3px solid var(--accent);padding:2px 0;padding-inline-start:13px;font-size:13px;color:var(--muted)}
+.note b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px;font-size:13.5px}
+.rail footer{margin-top:auto;font-size:11.5px;color:var(--muted);line-height:1.6}
+.themeToggle{align-self:flex-start;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;color:var(--muted);background:var(--panel)}
+.stage{display:grid;place-items:center;padding:40px 20px}
+
+.phone{width:392px;height:830px;max-height:calc(100vh - 80px);background:var(--panel);border-radius:34px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+.status{display:flex;justify-content:space-between;align-items:center;padding:11px 20px 5px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto}
+.view{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
+.view::-webkit-scrollbar{width:0}
+.pad{padding:0 18px 22px}
+
+.appbar{display:flex;align-items:center;gap:12px;padding:6px 18px 12px}
+.appbar h2{font-family:var(--font-display);font-weight:600;font-size:21px;margin:0;letter-spacing:-.02em}
+html[lang="ar"] .appbar h2{font-size:19px;letter-spacing:0}
+.back{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);display:grid;place-items:center;font-size:15px;line-height:1;flex:0 0 auto}
+
+.freshband{margin:0 18px 14px;padding:11px 13px;border-radius:12px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent)}
+.freshband .l1{font-size:13.5px;font-weight:600;color:var(--accent)}
+.freshband .l2{font-size:12px;color:var(--muted);margin-top:2px}
+
+.rowcards{display:flex;gap:9px;overflow-x:auto;padding:0 18px 4px;scrollbar-width:none}
+.rowcards::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;color:var(--muted);background:var(--panel);white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+
+.searchbox{margin:0 18px 14px;display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--panel)}
+.searchbox input{border:0;background:none;font:inherit;font-size:14px;color:var(--ink);width:100%;outline:none}
+.searchbox span{color:var(--muted);font-size:14px}
+
+.item{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:13px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line-soft);width:100%;text-align:start}
+.thumb{width:62px;height:62px;border-radius:11px;display:grid;place-items:center;font-size:27px;background:var(--line-soft)}
+.item h3{margin:0;font-size:14.5px;font-weight:600;line-height:1.3}
+.item .meta{font-size:12px;color:var(--muted);margin-top:3px}
+.tag{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:5px;margin-inline-end:5px;font-weight:600}
+.tag.cold{background:var(--cold-soft);color:var(--cold)}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.low{background:var(--warn-soft);color:var(--warn)}
+.tag.out{background:var(--line-soft);color:var(--muted)}
+.tag.promo{background:var(--accent-soft);color:var(--accent)}
+.price{text-align:end;font-variant-numeric:tabular-nums}
+.price b{font-family:var(--font-display);font-weight:600;font-size:17px}
+.price span{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.item[disabled]{opacity:.45}
+
+.hero{margin:0 18px 16px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.hero .top{padding:15px 16px 13px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.hero .top h3{margin:0;font-size:15px;font-weight:600}
+.hero .top p{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
+.hero .amount{font-family:var(--font-display);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap;direction:ltr}
+.hero .bar{height:5px;background:var(--line-soft)}
+.hero .bar i{display:block;height:100%;background:var(--accent)}
+.hero .bot{padding:11px 16px;font-size:12px;color:var(--muted);border-top:1px solid var(--line-soft)}
+
+.sect{margin:20px 18px 9px;display:flex;justify-content:space-between;align-items:baseline}
+.sect h3{font-family:var(--font-display);font-weight:600;font-size:16px;margin:0}
+.sect a{font-size:12.5px;color:var(--accent);text-decoration:none}
+
+.quickgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 18px}
+.quick{border:1px solid var(--line);border-radius:12px;padding:12px;text-align:start;display:flex;flex-direction:column;gap:3px}
+.quick b{font-size:13.5px;font-weight:600}
+.quick span{font-size:11.5px;color:var(--muted)}
+
+.photo{height:184px;border-radius:var(--radius);display:grid;place-items:center;font-size:62px;background:var(--line-soft);margin-bottom:15px;position:relative}
+.photo small{position:absolute;bottom:9px;inset-inline-end:11px;font-size:10.5px;color:var(--muted);background:var(--panel);padding:2px 7px;border-radius:5px}
+.ticket{border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:flex-end;gap:14px;background:linear-gradient(180deg,var(--panel),var(--line-soft))}
+.ticket .k{font-family:var(--font-display);font-size:30px;font-weight:600;letter-spacing:-.025em;font-variant-numeric:tabular-nums;line-height:1;direction:ltr}
+.ticket .u{font-size:12.5px;color:var(--muted);margin-top:5px}
+.ticket .r{text-align:end;font-size:12px;color:var(--muted);line-height:1.5}
+
+.specs{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.specs div{display:flex;justify-content:space-between;gap:14px;padding:10px 14px;font-size:13px;border-bottom:1px solid var(--line-soft)}
+.specs div:last-child{border-bottom:0}
+.specs span{color:var(--muted)}
+.specs b{font-weight:600;text-align:end}
+
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.stepper button{width:44px;height:44px;font-size:19px;line-height:1;display:grid;place-items:center}
+.stepper button:hover{background:var(--line-soft)}
+.stepper .val{flex:1;text-align:center;font-weight:600;font-variant-numeric:tabular-nums;font-size:15px;border-inline-start:1px solid var(--line);border-inline-end:1px solid var(--line);height:44px;display:grid;place-items:center}
+.unitpick{display:flex;gap:7px;margin:11px 0 14px}
+.unitpick button{flex:1;border:1px solid var(--line);border-radius:9px;padding:9px;font-size:12.5px;color:var(--muted)}
+.unitpick button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);font-weight:600}
+
+textarea.note-in{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px 12px;font:inherit;font-size:13.5px;resize:none;background:var(--panel);color:var(--ink)}
+textarea.note-in::placeholder{color:var(--muted)}
+
+.callout{display:flex;gap:10px;border-radius:11px;padding:11px 13px;font-size:12.5px;line-height:1.5;background:var(--warn-soft);color:var(--warn);margin:14px 0}
+.callout b{display:block;margin-bottom:2px}
+
+.cartline{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.cartline h4{margin:0;font-size:14px;font-weight:600}
+.cartline .q{font-size:12.5px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
+.cartline .n{font-size:12px;color:var(--muted);margin-top:4px;font-style:italic}
+.cartline .amt{text-align:end;font-variant-numeric:tabular-nums;font-weight:600;font-size:14.5px;white-space:nowrap}
+.cartline .rm{display:block;margin-top:6px;font-size:12px;color:var(--muted);text-align:end;width:100%}
+
+.totals{border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
+.totals div{display:flex;justify-content:space-between;font-size:13.5px;padding:4px 0;color:var(--muted);font-variant-numeric:tabular-nums}
+.totals div.big{color:var(--ink);font-size:17px;font-weight:600;padding-top:9px}
+.totals div.big b{font-family:var(--font-display)}
+
+.slot{width:100%;text-align:start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.slot[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.slot b{font-size:14px;font-weight:600;display:block}
+.slot span{font-size:12.5px;color:var(--muted)}
+.slot[disabled]{opacity:.42}
+
+.timeline{position:relative;padding-inline-start:26px;margin:4px 0 8px}
+.timeline::before{content:"";position:absolute;inset-inline-start:7px;top:8px;bottom:14px;width:2px;background:var(--line)}
+.tl{position:relative;padding:0 0 19px}
+.tl::before{content:"";position:absolute;inset-inline-start:-23px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--panel);border:2px solid var(--line)}
+.tl.done::before{background:var(--ok);border-color:var(--ok)}
+.tl.now::before{background:var(--accent);border-color:var(--accent)}
+.tl b{font-size:14px;font-weight:600;display:block}
+.tl span{font-size:12.5px;color:var(--muted)}
+.tl.todo b{color:var(--muted);font-weight:500}
+
+.ordercard{border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px;width:100%;text-align:start}
+.ordercard .h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.ordercard .h b{font-size:14px;font-variant-numeric:tabular-nums;direction:ltr}
+.ordercard .h span{font-size:12px;color:var(--muted)}
+.ordercard .d{font-size:12.5px;color:var(--muted);margin-top:5px}
+.ordercard .f{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.ordercard .f b{font-variant-numeric:tabular-nums;font-size:14.5px}
+.mini{border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:12.5px}
+
+.btn{display:block;width:100%;background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:14px;font-size:15px;font-weight:600;text-align:center}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.bar-bottom{flex:0 0 auto;padding:12px 18px;border-top:1px solid var(--line-soft);background:var(--panel)}
+.bar-bottom .sum{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:9px;font-variant-numeric:tabular-nums}
+.bar-bottom .sum b{color:var(--ink);font-size:15px}
+
+.tabs{flex:0 0 auto;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);background:var(--panel);padding:7px 4px 13px}
+.tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--muted);padding:5px 0;position:relative}
+.tabs button em{font-style:normal;font-size:18px;line-height:1}
+.tabs button[aria-current="true"]{color:var(--accent);font-weight:600}
+.badge{position:absolute;top:0;inset-inline-end:22%;background:var(--accent);color:var(--accent-ink);font-size:9.5px;font-weight:700;min-width:16px;height:16px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+
+.center{text-align:center;padding:34px 8px}
+.center .mark{font-size:52px;line-height:1}
+.center h3{font-family:var(--font-display);font-size:21px;font-weight:600;margin:14px 0 6px}
+.center p{color:var(--muted);font-size:13.5px;margin:0 auto;max-width:32ch}
+.empty{text-align:center;color:var(--muted);padding:46px 20px;font-size:13.5px}
+
+.login{padding:54px 26px 26px;display:flex;flex-direction:column;height:100%}
+.login .logo{font-family:var(--font-display);font-size:29px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
+html[lang="ar"] .login .logo{letter-spacing:0}
+.login .sub{color:var(--muted);font-size:13.5px;margin-top:8px;max-width:28ch}
+.field{margin-top:13px}
+.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:5px}
+.field input{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;font:inherit;font-size:14.5px;background:var(--panel);color:var(--ink)}
+.login .spacer{flex:1}
+.num{direction:ltr;unicode-bidi:embed;display:inline-block}
+
+@media (max-width:900px){
+  .bench{grid-template-columns:1fr}
+  .rail{border-inline-end:0;border-bottom:1px solid var(--line)}
+  .stage{padding:22px 12px 40px}
+  .phone{width:100%;max-width:392px;height:760px}
+}
+</style>
+</head>
+<body>
+<div class="bench">
+  <aside class="rail">
+    <div class="brandmark"><b>MarketViandes</b><span id="railTag"></span></div>
+    <h1 id="railTitle"></h1>
+    <p class="lead" id="railLead"></p>
+    <div class="langpick">
+      <button data-lang="fr" aria-pressed="true">Français</button>
+      <button data-lang="ar" aria-pressed="false">العربية</button>
+    </div>
+    <div class="screens" id="screenList"></div>
+    <div class="note" id="screenNote"></div>
+    <button class="themeToggle" id="themeBtn"></button>
+    <footer id="railFoot"></footer>
+  </aside>
+  <main class="stage">
+    <div class="phone">
+      <div class="status"><span class="num">08:42</span><span id="statusDate"></span></div>
+      <div class="view" id="view"></div>
+      <div id="bottom"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ===================== i18n ===================== */
+const DICT = {
+fr:{
+  railTag:"maquette v1",
+  railTitle:"Application client — commande de viande et volaille",
+  railLead:"Prototype cliquable. Données, prix et stocks fictifs. Naviguez dans le téléphone, ou passez d'un écran à l'autre ci-dessous.",
+  railFoot:"Maquette de travail, non contractuelle.<br>Back-office cible : Odoo 16.<br>Photos produits à remplacer par des prises de vue réelles.",
+  theme:"Basculer clair / sombre",
+  statusDate:"Mardi 16 septembre",
+  client:"Boucherie El Firdaous",
+  loginSub:"Commandez la viande et la volaille du jour, aux prix de votre compte.",
+  phone:"Téléphone", password:"Mot de passe",
+  smsHint:"Recevoir plutôt un code par SMS",
+  signin:"Se connecter", askAccount:"Demander un compte professionnel",
+  availTitle:"Disponibilité du mardi 16 septembre",
+  availSub:"Mise à jour à 08:10 · commandez avant 16:00 pour être livré demain matin",
+  balance:"Votre encours", ceiling:"Plafond autorisé 25 000,00 MAD",
+  dueSoon:"Une facture arrive à échéance vendredi : 4 120,00 MAD",
+  resume:"Reprendre une commande",
+  lastOrder:"Commande du 12/09", lastOrderSub:"6 poulets, hachée, merguez",
+  usual:"Mes habituels", usualSub:"9 produits enregistrés",
+  freshToday:"Frais du jour", seeAll:"Tout voir",
+  catalog:"Catalogue du jour", searchPh:"Poulet, hachée, merguez…",
+  fAll:"Tout", fPoultry:"Volaille", fRed:"Viande rouge", fFresh:"Frais", fFrozen:"Congelé", fPromo:"Promotions",
+  noResult:"Aucun produit ne correspond. Essayez un autre mot ou retirez les filtres.",
+  perKg:"MAD / kg", remaining:"restants", boxes:"caisses", kgs:"kg",
+  available:"disponible", low:"bientôt épuisé", out:"épuisé", promo:"promo", frozen:"congelé",
+  photoNote:"photo réelle à intégrer",
+  priceDated:"MAD par kilo · prix du 16/09 à 08:10",
+  soldAs:"Vendu", avgWeight:"Poids moyen", state:"État", useBy:"À consommer avant le", origin:"Origine",
+  perBox:"par caisse", perPiece:"la pièce",
+  orderBy:"Commander", byKg:"au kilo", byPiece:"à la pièce", byBox:"à la caisse",
+  approx:"Soit environ", prepPh:"Consigne de préparation : découpé en 8, sans peau, sous vide par 2 kg…",
+  estTitle:"Montant estimatif",
+  estBody:"Les produits vendus au poids sont facturés sur le poids réellement pesé à la préparation. Vous recevrez le montant définitif avant la livraison.",
+  estAmount:"Montant estimé", addToCart:"Ajouter au panier",
+  cart:"Panier", cartEmpty:"Votre panier est vide.", seeCatalog:"Voir le catalogue du jour",
+  items:"Articles", estWeight:"Poids estimé", estTotal:"Total estimé", remove:"Retirer",
+  minTitle:"Minimum de commande non atteint",
+  minBody1:"Votre zone est livrée à partir de", minBody2:"Il manque",
+  realTitle:"Facturation au poids réel",
+  realBody:"Le montant définitif sera ajusté après pesée à l'atelier, puis notifié dans l'application.",
+  chooseSlot:"Choisir le créneau",
+  delivery:"Livraison", address:"Adresse", zone:"Zone", contact:"Contact sur place",
+  slots:"Créneaux disponibles", cutoffTitle:"Heure limite : 16:00",
+  cutoffBody:"Passé cette heure, la commande part sur la tournée suivante.",
+  validate:"Valider la commande",
+  okTitle:"Commande enregistrée",
+  okBody:"Nous préparons votre commande. Le montant sera ajusté après pesée.",
+  number:"Numéro", slot:"Créneau",
+  nextTitle:"Prochaine étape",
+  nextBody:"Vous recevrez une notification avec le poids pesé et le montant définitif, avant le départ en tournée.",
+  followOrder:"Suivre la commande", backHome:"Retour à l'accueil",
+  order:"Commande", finalAmount:"Montant définitif",
+  weighedAt:"Pesé à l'atelier à 05:40", willAdjust:"Sera ajusté après pesée",
+  deliveryPlanned:"Livraison prévue demain entre 06:00 et 10:00",
+  gapLine:"écart +2,8 %, dans la tolérance de ±10 %",
+  orderedWeight:"Poids commandé", weighed:"pesé",
+  tl1:"Commande reçue", tl1s:"Hier 16:12",
+  tl2:"Confirmée par le commercial", tl2s:"Hier 16:35",
+  tl3:"En préparation à l'atelier", tl3s:"Aujourd'hui 05:10",
+  tl4:"Pesée et montant définitif", tl4s:"Aujourd'hui 05:40", tl4w:"En attente",
+  tl5:"En livraison", tl5s:"Tournée Kénitra centre",
+  tl6:"Livrée et signée",
+  weighOkTitle:"Poids réel enregistré",
+  weighOkBody:"Le détail ligne par ligne figure sur votre bon de livraison.",
+  simulate:"Simuler la pesée à l'atelier", unsimulate:"Revenir avant la pesée",
+  demoBtn:"Bouton de démonstration — n'existe pas dans l'application réelle",
+  myOrders:"Mes commandes", inPrep:"en préparation", estimated:"Estimé", reorder:"Recommander",
+  account:"Mon compte", customer:"Client", ice:"ICE", terms:"Conditions",
+  terms30:"Paiement à 30 jours", zoneVal:"Kénitra centre · lun, mer, ven",
+  finance:"Situation financière", outstanding:"Encours", limit:"Plafond autorisé", overdue:"Échu",
+  invoices:"Factures", logout:"Se déconnecter",
+  tHome:"Accueil", tCatalog:"Catalogue", tCart:"Panier", tOrders:"Commandes", tAccount:"Compte",
+  currency:"MAD",
+  screens:[
+   ["login","Connexion","Compte rattaché au client dans Odoo. Les comptes professionnels sont validés manuellement pour ne pas exposer les prix négociés."],
+   ["home","Accueil — disponibilité du jour","Le client voit ce qui a été publié ce matin, pas le catalogue complet. Heure de mise à jour et heure limite affichées en permanence."],
+   ["catalog","Catalogue","Filtres frais / congelé / promotions. Un produit épuisé reste visible mais grisé : le client comprend qu'il existe, sans pouvoir le commander."],
+   ["product","Fiche produit","Prix daté, unité de vente, poids moyen à la pièce, DLC et origine. La consigne de découpe est un champ libre, très utilisé par les restaurateurs."],
+   ["cart","Panier","Le caractère estimatif du montant est rappelé ici et sur la confirmation. Contrôles : minimum de commande, stock disponible, encours."],
+   ["delivery","Créneau de livraison","Seuls les créneaux réellement ouverts pour la zone du client sont proposés. Un calendrier libre produit des commandes non livrables."],
+   ["confirm","Confirmation","Numéro de commande immédiat et rappel que le montant sera ajusté après pesée."],
+   ["track","Suivi de commande","Le moment clé : quand l'atelier saisit le poids réel, le montant définitif est notifié au client. Bouton de simulation pour la démonstration."],
+   ["orders","Mes commandes","Historique avec les écarts de poids constatés. La re-commande en un geste est la fonction la plus utilisée par les clients réguliers."],
+   ["account","Mon compte","Encours, plafond autorisé et factures échues. Un blocage éventuel est expliqué, jamais silencieux."]
+  ],
+  pastLines:[
+   "Poulet entier ×6 · Viande hachée 8 kg · Merguez 4 kg",
+   "Blanc de poulet 12 kg · Kefta 5 kg",
+   "Entrecôte 6 kg · Épaule de veau 10 kg"
+  ],
+  pastDates:["Vendredi 12 septembre","Mercredi 10 septembre","Lundi 8 septembre"],
+  pastStatus:["Livrée","Livrée","Livrée · écart −0,4 kg"],
+  slotDays:["Mercredi 17 septembre","Mercredi 17 septembre","Jeudi 18 septembre","Vendredi 19 septembre"],
+  slotNotes:["Tournée Kénitra centre","Tournée Kénitra centre","Zone non desservie le jeudi","Tournée Kénitra centre"],
+  addr:"12 rue Al Massira, Kénitra", contactVal:"Hassan · 06 61 24 88 07",
+  invLines:["FA-2026-1187 · échue le 12/09","FA-2026-1204 · échéance 28/09","FA-2026-1219 · échéance 05/10"],
+  promoText:"−15 % jusqu'à ce soir"
+},
+ar:{
+  railTag:"نموذج أولي",
+  railTitle:"تطبيق الزبناء — طلب اللحوم والدواجن",
+  railLead:"نموذج تفاعلي. المعطيات والأثمنة والمخزون افتراضية. تصفّح داخل الهاتف أو انتقل بين الشاشات أسفله.",
+  railFoot:"نموذج عمل غير تعاقدي.<br>النظام الخلفي: أودو 16.<br>صور المنتجات تُستبدل بصور حقيقية.",
+  theme:"تبديل الوضع الفاتح / الداكن",
+  statusDate:"الثلاثاء 16 شتنبر",
+  client:"جزارة الفردوس",
+  loginSub:"اطلب لحوم ودواجن اليوم بأثمنة حسابك.",
+  phone:"الهاتف", password:"كلمة المرور",
+  smsHint:"استلام رمز عبر رسالة قصيرة بدل ذلك",
+  signin:"تسجيل الدخول", askAccount:"طلب حساب مهني",
+  availTitle:"متوفر اليوم الثلاثاء 16 شتنبر",
+  availSub:"آخر تحديث 08:10 · اطلب قبل 16:00 ليصلك غدا صباحا",
+  balance:"رصيدك المستحق", ceiling:"السقف المسموح 25 000,00 درهم",
+  dueSoon:"فاتورة تحل يوم الجمعة: 4 120,00 درهم",
+  resume:"إعادة طلب سابق",
+  lastOrder:"طلب 12/09", lastOrderSub:"6 دجاجات، لحم مفروم، مرقاز",
+  usual:"منتجاتي المعتادة", usualSub:"9 منتجات محفوظة",
+  freshToday:"طازج اليوم", seeAll:"عرض الكل",
+  catalog:"منتجات اليوم", searchPh:"دجاج، مفروم، مرقاز…",
+  fAll:"الكل", fPoultry:"دواجن", fRed:"لحوم حمراء", fFresh:"طازج", fFrozen:"مجمّد", fPromo:"عروض",
+  noResult:"لا يوجد منتج مطابق. جرّب كلمة أخرى أو أزل عوامل التصفية.",
+  perKg:"درهم / كلغ", remaining:"متبقية", boxes:"صندوق", kgs:"كلغ",
+  available:"متوفر", low:"على وشك النفاد", out:"نفد", promo:"عرض", frozen:"مجمّد",
+  photoNote:"صورة حقيقية لاحقا",
+  priceDated:"درهم للكيلوغرام · ثمن 16/09 على الساعة 08:10",
+  soldAs:"طريقة البيع", avgWeight:"الوزن المتوسط", state:"الحالة", useBy:"يُستهلك قبل", origin:"المصدر",
+  perBox:"للصندوق", perPiece:"للقطعة",
+  orderBy:"الطلب", byKg:"بالكيلوغرام", byPiece:"بالقطعة", byBox:"بالصندوق",
+  approx:"أي حوالي", prepPh:"تعليمات التحضير: مقطّع إلى 8، بدون جلد، مفرّغ الهواء 2 كلغ…",
+  estTitle:"مبلغ تقديري",
+  estBody:"المنتجات المباعة بالوزن تُفوتر حسب الوزن الفعلي عند التحضير. سنوافيك بالمبلغ النهائي قبل التوصيل.",
+  estAmount:"المبلغ التقديري", addToCart:"أضف إلى السلة",
+  cart:"السلة", cartEmpty:"سلتك فارغة.", seeCatalog:"تصفّح منتجات اليوم",
+  items:"المنتجات", estWeight:"الوزن التقديري", estTotal:"المجموع التقديري", remove:"حذف",
+  minTitle:"الحد الأدنى للطلب غير مستوفى",
+  minBody1:"منطقتك تُخدم ابتداء من", minBody2:"ينقص",
+  realTitle:"الفوترة بالوزن الفعلي",
+  realBody:"يُحتسب المبلغ النهائي بعد الوزن في الورشة، ثم تصلك إشعارا في التطبيق.",
+  chooseSlot:"اختيار وقت التوصيل",
+  delivery:"التوصيل", address:"العنوان", zone:"المنطقة", contact:"جهة الاتصال",
+  slots:"الأوقات المتاحة", cutoffTitle:"آخر أجل: 16:00",
+  cutoffBody:"بعد هذه الساعة، يُدرج الطلب في الجولة الموالية.",
+  validate:"تأكيد الطلب",
+  okTitle:"تم تسجيل الطلب",
+  okBody:"نحن نحضّر طلبك. سيُعدَّل المبلغ بعد الوزن.",
+  number:"الرقم", slot:"الوقت",
+  nextTitle:"الخطوة التالية",
+  nextBody:"ستصلك إشعارا بالوزن الفعلي والمبلغ النهائي قبل انطلاق الجولة.",
+  followOrder:"تتبع الطلب", backHome:"العودة إلى الرئيسية",
+  order:"الطلب", finalAmount:"المبلغ النهائي",
+  weighedAt:"تم الوزن في الورشة على الساعة 05:40", willAdjust:"سيُعدَّل بعد الوزن",
+  deliveryPlanned:"التوصيل غدا بين 06:00 و 10:00",
+  gapLine:"فارق +2,8 ٪، ضمن هامش ±10 ٪",
+  orderedWeight:"الوزن المطلوب", weighed:"الوزن الفعلي",
+  tl1:"تم استلام الطلب", tl1s:"أمس 16:12",
+  tl2:"تم التأكيد من طرف المسؤول التجاري", tl2s:"أمس 16:35",
+  tl3:"قيد التحضير في الورشة", tl3s:"اليوم 05:10",
+  tl4:"الوزن والمبلغ النهائي", tl4s:"اليوم 05:40", tl4w:"في الانتظار",
+  tl5:"في طريق التوصيل", tl5s:"جولة القنيطرة المركز",
+  tl6:"تم التوصيل والتوقيع",
+  weighOkTitle:"تم تسجيل الوزن الفعلي",
+  weighOkBody:"التفاصيل سطرا بسطر مدرجة في سند التسليم.",
+  simulate:"محاكاة الوزن في الورشة", unsimulate:"الرجوع إلى ما قبل الوزن",
+  demoBtn:"زر للعرض التوضيحي — غير موجود في التطبيق الحقيقي",
+  myOrders:"طلباتي", inPrep:"قيد التحضير", estimated:"تقديري", reorder:"إعادة الطلب",
+  account:"حسابي", customer:"الزبون", ice:"المعرف الموحد", terms:"شروط الأداء",
+  terms30:"الأداء داخل 30 يوما", zoneVal:"القنيطرة المركز · الاثنين، الأربعاء، الجمعة",
+  finance:"الوضعية المالية", outstanding:"الرصيد المستحق", limit:"السقف المسموح", overdue:"المستحق",
+  invoices:"الفواتير", logout:"تسجيل الخروج",
+  tHome:"الرئيسية", tCatalog:"المنتجات", tCart:"السلة", tOrders:"الطلبات", tAccount:"حسابي",
+  currency:"درهم",
+  screens:[
+   ["login","تسجيل الدخول","الحساب مرتبط ببطاقة الزبون في أودو. الحسابات المهنية تُفعَّل يدويا حتى لا تظهر الأثمنة التفاوضية للجميع."],
+   ["home","الرئيسية — متوفر اليوم","الزبون يرى ما تم نشره هذا الصباح فقط، لا كل الكتالوج. ساعة التحديث وآخر أجل ظاهران دائما."],
+   ["catalog","المنتجات","تصفية: طازج / مجمّد / عروض. المنتج الذي نفد يبقى ظاهرا لكن معطّلا: الزبون يفهم أنه موجود دون أن يطلبه."],
+   ["product","بطاقة المنتج","الثمن مؤرخ، وحدة البيع، الوزن المتوسط للقطعة، تاريخ الاستهلاك والمصدر. خانة تعليمات التقطيع يستعملها أصحاب المطاعم كثيرا."],
+   ["cart","السلة","الطابع التقديري للمبلغ مذكور هنا وفي التأكيد. المراقبة: الحد الأدنى للطلب، المخزون، الرصيد المستحق."],
+   ["delivery","وقت التوصيل","تُعرض فقط الأوقات المفتوحة فعليا لمنطقة الزبون. التقويم الحر يُنتج طلبات غير قابلة للتوصيل."],
+   ["confirm","التأكيد","رقم الطلب فورا، مع التذكير بأن المبلغ سيُعدَّل بعد الوزن."],
+   ["track","تتبع الطلب","اللحظة الحاسمة: عند إدخال الوزن الفعلي في الورشة، يُشعَر الزبون بالمبلغ النهائي. زر المحاكاة مخصص للعرض."],
+   ["orders","طلباتي","السجل مع فوارق الوزن. إعادة الطلب بضغطة واحدة هي الوظيفة الأكثر استعمالا لدى الزبناء المنتظمين."],
+   ["account","حسابي","الرصيد، السقف المسموح والفواتير المستحقة. أي حظر يُشرح للزبون، ولا يقع في صمت."]
+  ],
+  pastLines:[
+   "دجاج كامل ×6 · لحم مفروم 8 كلغ · مرقاز 4 كلغ",
+   "صدر الدجاج 12 كلغ · كفتة 5 كلغ",
+   "أنتركوت 6 كلغ · كتف العجل 10 كلغ"
+  ],
+  pastDates:["الجمعة 12 شتنبر","الأربعاء 10 شتنبر","الاثنين 8 شتنبر"],
+  pastStatus:["تم التوصيل","تم التوصيل","تم التوصيل · فارق −0,4 كلغ"],
+  slotDays:["الأربعاء 17 شتنبر","الأربعاء 17 شتنبر","الخميس 18 شتنبر","الجمعة 19 شتنبر"],
+  slotNotes:["جولة القنيطرة المركز","جولة القنيطرة المركز","المنطقة غير مخدومة يوم الخميس","جولة القنيطرة المركز"],
+  addr:"12 زنقة المسيرة، القنيطرة", contactVal:"حسن · 06 61 24 88 07",
+  invLines:["FA-2026-1187 · مستحقة منذ 12/09","FA-2026-1204 · أجل 28/09","FA-2026-1219 · أجل 05/10"],
+  promoText:"−15 ٪ إلى غاية هذا المساء"
+}};
+
+let LANG = "fr";
+const t = k => DICT[LANG][k];
+
+/* ===================== données ===================== */
+const PRODUCTS = [
+  {id:1, cat:"volaille", ic:"🍗", p:32, u:"piece", avg:1.4, state:"frais", stock:240, dlc:"19/09",
+   n:{fr:"Poulet entier prêt à cuire", ar:"دجاج كامل جاهز للطبخ"}, org:{fr:"Abattoir Sidi Yahya", ar:"مجزرة سيدي يحيى"}},
+  {id:2, cat:"volaille", ic:"🍗", p:78, u:"kg", state:"frais", stock:62, dlc:"18/09",
+   n:{fr:"Blanc de poulet", ar:"صدر الدجاج"}, org:{fr:"Abattoir Sidi Yahya", ar:"مجزرة سيدي يحيى"}},
+  {id:3, cat:"volaille", ic:"🍗", p:36, u:"kg", state:"frais", stock:118, dlc:"18/09",
+   n:{fr:"Cuisse de poulet", ar:"أفخاذ الدجاج"}, org:{fr:"Abattoir Sidi Yahya", ar:"مجزرة سيدي يحيى"}},
+  {id:4, cat:"volaille", ic:"🍗", p:28, u:"caisse", avg:10, state:"congelé", stock:38,
+   n:{fr:"Ailes de poulet", ar:"أجنحة الدجاج"}, org:{fr:"Import", ar:"مستورد"}},
+  {id:5, cat:"volaille", ic:"🦃", p:52, u:"kg", state:"frais", stock:24, dlc:"18/09",
+   n:{fr:"Dinde découpée", ar:"ديك رومي مقطّع"}, org:{fr:"Ferme El Manar", ar:"ضيعة المنار"}},
+  {id:6, cat:"rouge", ic:"🥩", p:78, u:"kg", state:"frais", stock:94, dlc:"17/09",
+   n:{fr:"Viande hachée de bœuf", ar:"لحم بقري مفروم"}, org:{fr:"Abattoir Kénitra", ar:"مجزرة القنيطرة"}},
+  {id:7, cat:"rouge", ic:"🥩", p:112, u:"kg", state:"frais", stock:16, dlc:"18/09",
+   n:{fr:"Entrecôte de bœuf", ar:"أنتركوت بقري"}, org:{fr:"Abattoir Kénitra", ar:"مجزرة القنيطرة"}},
+  {id:8, cat:"rouge", ic:"🥩", p:96, u:"kg", state:"frais", stock:47, dlc:"18/09",
+   n:{fr:"Épaule de veau", ar:"كتف العجل"}, org:{fr:"Abattoir Kénitra", ar:"مجزرة القنيطرة"}},
+  {id:9, cat:"rouge", ic:"🍖", p:118, u:"piece", avg:2.2, state:"frais", stock:22, dlc:"19/09",
+   n:{fr:"Gigot d'agneau", ar:"فخذ الخروف"}, org:{fr:"Ferme Zaër", ar:"ضيعة زعير"}},
+  {id:10, cat:"transforme", ic:"🌭", p:68, u:"kg", state:"frais", stock:31, dlc:"17/09", promo:true,
+   n:{fr:"Merguez maison", ar:"مرقاز بلدي"}, org:{fr:"Atelier MarketViandes", ar:"ورشة ماركت فياند"}},
+  {id:11, cat:"transforme", ic:"🍖", p:82, u:"kg", state:"frais", stock:19, dlc:"17/09",
+   n:{fr:"Kefta de bœuf", ar:"كفتة بقرية"}, org:{fr:"Atelier MarketViandes", ar:"ورشة ماركت فياند"}},
+  {id:12, cat:"rouge", ic:"🦴", p:24, u:"kg", state:"frais", stock:0,
+   n:{fr:"Os à moelle", ar:"عظم النخاع"}, org:{fr:"Abattoir Kénitra", ar:"مجزرة القنيطرة"}}
+];
+const PAST = [
+  {ref:"CMD-2026-0398", real:1041.60},
+  {ref:"CMD-2026-0371", real:1352.40},
+  {ref:"CMD-2026-0344", real:1598.80}
+];
+const SLOTS = [
+  {id:"a", h:"06:00 – 10:00", open:true},
+  {id:"b", h:"14:00 – 17:00", open:true},
+  {id:"c", h:"06:00 – 10:00", open:false},
+  {id:"d", h:"06:00 – 10:00", open:true}
+];
+const INV = [4120.00, 6048.00, 4112.00];
+
+let S = {screen:"login", cart:[], product:null, qty:1, unit:null, note:"", filter:"all", search:"", slot:null, weighed:false, ref:"CMD-2026-0412"};
+const MIN_ORDER = 400;
+
+const fmt = n => n.toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const kg  = n => n.toLocaleString("fr-FR",{minimumFractionDigits:3,maximumFractionDigits:3});
+const num = s => `<span class="num">${s}</span>`;
+const pname = p => p.n[LANG];
+
+function lineWeight(l){
+  const p = PRODUCTS.find(x=>x.id===l.id);
+  if(l.unit==="kg") return l.qty;
+  return l.qty * (p.avg || (l.unit==="caisse"?10:1));
+}
+const lineAmount = l => lineWeight(l) * PRODUCTS.find(x=>x.id===l.id).p;
+const cartTotal = () => S.cart.reduce((s,l)=>s+lineAmount(l),0);
+
+const unitsOf = p => p.u==="kg" ? ["kg"] : p.u==="piece" ? ["piece","kg"] : ["caisse","kg"];
+const unitLabel = u => u==="kg" ? t("byKg") : u==="piece" ? t("byPiece") : t("byBox");
+const unitShort = u => u==="kg" ? t("kgs") : u==="piece" ? (LANG==="ar"?"قطعة":"pièce") : (LANG==="ar"?"صندوق":"caisse");
+
+function stockTag(p){
+  if(p.stock===0) return `<span class="tag out">${t("out")}</span>`;
+  if(p.stock<25)  return `<span class="tag low">${t("low")}</span>`;
+  return `<span class="tag ok">${t("available")}</span>`;
+}
+
+/* ===================== écrans ===================== */
+function viewLogin(){
+  return `<div class="login">
+    <div class="logo">MarketViandes</div>
+    <p class="sub">${t("loginSub")}</p>
+    <div class="field"><label>${t("phone")}</label><input value="06 61 24 88 07" inputmode="tel" dir="ltr"></div>
+    <div class="field"><label>${t("password")}</label><input type="password" value="••••••••" dir="ltr"></div>
+    <div style="margin-top:12px;font-size:12.5px;color:var(--muted)">${t("smsHint")}</div>
+    <div class="spacer"></div>
+    <button class="btn" data-go="home">${t("signin")}</button>
+    <button class="btn ghost" style="margin-top:9px" data-go="home">${t("askAccount")}</button>
+  </div>`;
+}
+
+function itemRow(p){
+  const out = p.stock===0;
+  return `<button class="item" ${out?"disabled":""} data-product="${p.id}">
+    <div class="thumb">${p.ic}</div>
+    <div>
+      <h3>${pname(p)}</h3>
+      <div class="meta">
+        ${p.state==="congelé" ? `<span class="tag cold">${t("frozen")}</span>` : ""}
+        ${p.promo ? `<span class="tag promo">${t("promo")}</span>` : ""}
+        ${stockTag(p)}
+        ${out ? "" : num(p.stock) + " " + (p.u==="caisse"?t("boxes"):t("kgs")) + " " + t("remaining")}
+      </div>
+    </div>
+    <div class="price"><b>${num(fmt(p.p))}</b><span>${t("perKg")}</span></div>
+  </button>`;
+}
+
+function viewHome(){
+  const habituels = [1,6,10,2].map(id=>PRODUCTS.find(p=>p.id===id));
+  return `
+  <div class="appbar"><h2>${t("client")}</h2></div>
+  <div class="freshband">
+    <div class="l1">${t("availTitle")}</div>
+    <div class="l2">${t("availSub")}</div>
+  </div>
+  <div class="hero">
+    <div class="top">
+      <div><h3>${t("balance")}</h3><p>${t("ceiling")}</p></div>
+      <div class="amount">14 280,00</div>
+    </div>
+    <div class="bar"><i style="width:57%"></i></div>
+    <div class="bot">${t("dueSoon")}</div>
+  </div>
+  <div class="sect"><h3>${t("resume")}</h3></div>
+  <div class="quickgrid">
+    <button class="quick" data-reorder="1"><b>${t("lastOrder")}</b><span>${t("lastOrderSub")}</span></button>
+    <button class="quick" data-tab="catalog"><b>${t("usual")}</b><span>${t("usualSub")}</span></button>
+  </div>
+  <div class="sect"><h3>${t("freshToday")}</h3><a href="#" data-tab="catalog">${t("seeAll")}</a></div>
+  <div class="pad">${habituels.map(itemRow).join("")}</div>`;
+}
+
+function viewCatalog(){
+  const f = S.filter, q = S.search.trim().toLowerCase();
+  const list = PRODUCTS.filter(p=>{
+    if(f==="frais" && p.state!=="frais") return false;
+    if(f==="congele" && p.state!=="congelé") return false;
+    if(f==="promo" && !p.promo) return false;
+    if(f==="volaille" && p.cat!=="volaille") return false;
+    if(f==="rouge" && p.cat!=="rouge") return false;
+    if(q && !(p.n.fr+" "+p.n.ar).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const chips = [["all",t("fAll")],["volaille",t("fPoultry")],["rouge",t("fRed")],["frais",t("fFresh")],["congele",t("fFrozen")],["promo",t("fPromo")]];
+  return `
+  <div class="appbar"><h2>${t("catalog")}</h2></div>
+  <div class="searchbox"><span>⌕</span><input id="q" placeholder="${t("searchPh")}" value="${S.search}"></div>
+  <div class="rowcards" style="margin-bottom:6px">
+    ${chips.map(([k,l])=>`<button class="chip" aria-pressed="${f===k}" data-filter="${k}">${l}</button>`).join("")}
+  </div>
+  <div class="pad">${list.length ? list.map(itemRow).join("") : `<div class="empty">${t("noResult")}</div>`}</div>`;
+}
+
+function viewProduct(){
+  const p = PRODUCTS.find(x=>x.id===S.product);
+  const w = S.unit==="kg" ? S.qty : S.qty*(p.avg||(S.unit==="caisse"?10:1));
+  return `
+  <div class="appbar"><button class="back" data-back="catalog">${LANG==="ar"?"→":"←"}</button><h2 style="font-size:17px">${pname(p)}</h2></div>
+  <div class="pad">
+    <div class="photo">${p.ic}<small>${t("photoNote")}</small></div>
+    <div class="ticket">
+      <div><div class="k">${fmt(p.p)}</div><div class="u">${t("priceDated")}</div></div>
+      <div class="r">
+        ${p.promo?`<span class="tag promo">${t("promoText")}</span><br>`:""}
+        ${stockTag(p)}<br>${num(p.stock)} ${p.u==="caisse"?t("boxes"):t("kgs")} ${t("remaining")}
+      </div>
+    </div>
+    <div class="specs">
+      <div><span>${t("soldAs")}</span><b>${unitLabel(p.u)}</b></div>
+      ${p.avg?`<div><span>${t("avgWeight")}</span><b>≈ ${num(kg(p.avg))} ${t("kgs")} ${p.u==="caisse"?t("perBox"):t("perPiece")}</b></div>`:""}
+      <div><span>${t("state")}</span><b>${p.state==="congelé"?t("fFrozen"):t("fFresh")}</b></div>
+      ${p.dlc?`<div><span>${t("useBy")}</span><b>${num(p.dlc)}</b></div>`:""}
+      <div><span>${t("origin")}</span><b>${p.org[LANG]}</b></div>
+    </div>
+    <div class="unitpick">
+      ${unitsOf(p).map(u=>`<button aria-pressed="${S.unit===u}" data-unit="${u}">${t("orderBy")} ${unitLabel(u)}</button>`).join("")}
+    </div>
+    <div class="stepper">
+      <button data-qty="-1">−</button>
+      <div class="val">${num(S.qty)} ${unitShort(S.unit)}</div>
+      <button data-qty="1">+</button>
+    </div>
+    ${S.unit!=="kg"?`<div style="font-size:12.5px;color:var(--muted);margin-top:9px">${t("approx")} ${num(kg(w))} ${t("kgs")} · ${num(fmt(w*p.p))} ${t("currency")}</div>`:""}
+    <div style="margin-top:15px">
+      <textarea class="note-in" id="prep" rows="2" placeholder="${t("prepPh")}">${S.note}</textarea>
+    </div>
+    <div class="callout"><span>⚖</span><div><b>${t("estTitle")}</b>${t("estBody")}</div></div>
+  </div>`;
+}
+
+function viewCart(){
+  if(!S.cart.length){
+    return `<div class="appbar"><h2>${t("cart")}</h2></div>
+      <div class="empty">${t("cartEmpty")}<br><br><button class="mini" data-tab="catalog">${t("seeCatalog")}</button></div>`;
+  }
+  const total = cartTotal();
+  return `
+  <div class="appbar"><h2>${t("cart")}</h2></div>
+  <div class="pad">
+    ${S.cart.map((l,i)=>{
+      const p = PRODUCTS.find(x=>x.id===l.id);
+      return `<div class="cartline">
+        <div>
+          <h4>${pname(p)}</h4>
+          <div class="q">${num(l.qty)} ${unitShort(l.unit)}${l.unit!=="kg"?` ≈ ${num(kg(lineWeight(l)))} ${t("kgs")}`:""} · ${num(fmt(p.p))} ${t("perKg")}</div>
+          ${l.note?`<div class="n">« ${l.note} »</div>`:""}
+        </div>
+        <div>
+          <div class="amt">${l.unit==="kg"?"":"≈ "}${num(fmt(lineAmount(l)))}</div>
+          <button class="rm" data-remove="${i}">${t("remove")}</button>
+        </div>
+      </div>`;
+    }).join("")}
+    <div class="totals">
+      <div><span>${t("items")}</span><span>${num(S.cart.length)}</span></div>
+      <div><span>${t("estWeight")}</span><span>${num(kg(S.cart.reduce((s,l)=>s+lineWeight(l),0)))} ${t("kgs")}</span></div>
+      <div class="big"><span>${t("estTotal")}</span><b>${num(fmt(total))} ${t("currency")}</b></div>
+    </div>
+    ${total<MIN_ORDER?`<div class="callout"><span>!</span><div><b>${t("minTitle")}</b>${t("minBody1")} ${fmt(MIN_ORDER)} ${t("currency")}. ${t("minBody2")} ${fmt(MIN_ORDER-total)} ${t("currency")}.</div></div>`:""}
+    <div class="callout"><span>⚖</span><div><b>${t("realTitle")}</b>${t("realBody")}</div></div>
+  </div>`;
+}
+
+function viewDelivery(){
+  return `
+  <div class="appbar"><button class="back" data-back="cart">${LANG==="ar"?"→":"←"}</button><h2>${t("delivery")}</h2></div>
+  <div class="pad">
+    <div class="specs" style="margin-bottom:17px">
+      <div><span>${t("address")}</span><b>${t("addr")}</b></div>
+      <div><span>${t("zone")}</span><b>${t("zoneVal")}</b></div>
+      <div><span>${t("contact")}</span><b>${t("contactVal")}</b></div>
+    </div>
+    <div class="sect" style="margin:0 0 10px"><h3>${t("slots")}</h3></div>
+    ${SLOTS.map((s,i)=>`
+      <button class="slot" ${s.open?"":"disabled"} aria-pressed="${S.slot===s.id}" data-slot="${s.id}">
+        <span><b>${t("slotDays")[i]}</b><span>${num(s.h)} · ${t("slotNotes")[i]}</span></span>
+        <span style="font-size:19px">${S.slot===s.id?"●":"○"}</span>
+      </button>`).join("")}
+    <div class="callout" style="background:var(--line-soft);color:var(--muted)">
+      <span>⏱</span><div><b>${t("cutoffTitle")}</b>${t("cutoffBody")}</div>
+    </div>
+  </div>`;
+}
+
+function viewConfirm(){
+  const i = SLOTS.findIndex(x=>x.id===S.slot);
+  const s = SLOTS[i<0?0:i];
+  return `
+  <div class="pad" style="padding-top:12px">
+    <div class="center">
+      <div class="mark">✓</div>
+      <h3>${t("okTitle")}</h3>
+      <p>${t("okBody")}</p>
+    </div>
+    <div class="specs">
+      <div><span>${t("number")}</span><b>${num(S.ref)}</b></div>
+      <div><span>${t("delivery")}</span><b>${t("slotDays")[i<0?0:i]}</b></div>
+      <div><span>${t("slot")}</span><b>${num(s.h)}</b></div>
+      <div><span>${t("items")}</span><b>${num(S.cart.length)}</b></div>
+      <div><span>${t("estTotal")}</span><b>${num(fmt(cartTotal()))} ${t("currency")}</b></div>
+    </div>
+    <div class="callout"><span>⚖</span><div><b>${t("nextTitle")}</b>${t("nextBody")}</div></div>
+  </div>`;
+}
+
+function viewTrack(){
+  const est = cartTotal() || 1180;
+  const real = est*1.028;
+  return `
+  <div class="appbar"><h2>${t("order")} ${num(S.ref)}</h2></div>
+  <div class="pad">
+    <div class="hero" style="margin:0 0 17px">
+      <div class="top">
+        <div><h3>${S.weighed?t("finalAmount"):t("estAmount")}</h3><p>${S.weighed?t("weighedAt"):t("willAdjust")}</p></div>
+        <div class="amount">${fmt(S.weighed?real:est)}</div>
+      </div>
+      ${S.weighed
+        ? `<div class="bot">${t("orderedWeight")} ${num(kg(est/78))} ${t("kgs")} → ${t("weighed")} ${num(kg(real/78))} ${t("kgs")} · ${t("gapLine")}</div>`
+        : `<div class="bot">${t("deliveryPlanned")}</div>`}
+    </div>
+    <div class="timeline">
+      <div class="tl done"><b>${t("tl1")}</b><span>${t("tl1s")}</span></div>
+      <div class="tl done"><b>${t("tl2")}</b><span>${t("tl2s")}</span></div>
+      <div class="tl ${S.weighed?"done":"now"}"><b>${t("tl3")}</b><span>${t("tl3s")}</span></div>
+      <div class="tl ${S.weighed?"now":"todo"}"><b>${t("tl4")}</b><span>${S.weighed?t("tl4s"):t("tl4w")}</span></div>
+      <div class="tl todo"><b>${t("tl5")}</b><span>${t("tl5s")}</span></div>
+      <div class="tl todo"><b>${t("tl6")}</b><span>—</span></div>
+    </div>
+    ${S.weighed?`<div class="callout" style="background:var(--ok-soft);color:var(--ok)"><span>✓</span><div><b>${t("weighOkTitle")}</b>${t("weighOkBody")}</div></div>`:""}
+    <button class="btn ghost" data-weigh="1">${S.weighed?t("unsimulate"):t("simulate")}</button>
+    <div style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px">${t("demoBtn")}</div>
+  </div>`;
+}
+
+function viewOrders(){
+  return `
+  <div class="appbar"><h2>${t("myOrders")}</h2></div>
+  <div class="pad">
+    <button class="ordercard" data-tab="track">
+      <div class="h"><b>${S.ref}</b><span class="tag low">${t("inPrep")}</span></div>
+      <div class="d">${t("deliveryPlanned")}</div>
+      <div class="f"><span style="font-size:12.5px;color:var(--muted)">${t("estimated")}</span><b>${num(fmt(cartTotal()||1180))} ${t("currency")}</b></div>
+    </button>
+    ${PAST.map((o,i)=>`
+      <div class="ordercard">
+        <div class="h"><b>${o.ref}</b><span>${t("pastStatus")[i]}</span></div>
+        <div class="d">${t("pastDates")[i]}<br>${t("pastLines")[i]}</div>
+        <div class="f">
+          <button class="mini" data-reorder="1">${t("reorder")}</button>
+          <b>${num(fmt(o.real))} ${t("currency")}</b>
+        </div>
+      </div>`).join("")}
+  </div>`;
+}
+
+function viewAccount(){
+  return `
+  <div class="appbar"><h2>${t("account")}</h2></div>
+  <div class="pad">
+    <div class="specs" style="margin-bottom:17px">
+      <div><span>${t("customer")}</span><b>${t("client")}</b></div>
+      <div><span>${t("ice")}</span><b>${num("002 415 887 000 061")}</b></div>
+      <div><span>${t("zone")}</span><b>${t("zoneVal")}</b></div>
+      <div><span>${t("terms")}</span><b>${t("terms30")}</b></div>
+    </div>
+    <div class="sect" style="margin:0 0 10px"><h3>${t("finance")}</h3></div>
+    <div class="specs" style="margin-bottom:17px">
+      <div><span>${t("outstanding")}</span><b>${num("14 280,00")} ${t("currency")}</b></div>
+      <div><span>${t("limit")}</span><b>${num("25 000,00")} ${t("currency")}</b></div>
+      <div><span>${t("overdue")}</span><b style="color:var(--accent)">${num("4 120,00")} ${t("currency")}</b></div>
+    </div>
+    <div class="sect" style="margin:0 0 10px"><h3>${t("invoices")}</h3></div>
+    <div class="specs">
+      ${INV.map((v,i)=>`<div><span>${t("invLines")[i]}</span><b>${num(fmt(v))}</b></div>`).join("")}
+    </div>
+    <button class="btn ghost" style="margin-top:17px" data-go="login">${t("logout")}</button>
+  </div>`;
+}
+
+function bottomBar(){
+  const tabs = [["home",t("tHome"),"⌂"],["catalog",t("tCatalog"),"☰"],["cart",t("tCart"),"▣"],["orders",t("tOrders"),"✓"],["account",t("tAccount"),"◉"]];
+  const nav = `<div class="tabs">${tabs.map(([k,l,i])=>`
+      <button data-tab="${k}" aria-current="${S.screen===k||(k==="orders"&&S.screen==="track")}">
+        <em>${i}</em>${l}${k==="cart"&&S.cart.length?`<span class="badge">${S.cart.length}</span>`:""}
+      </button>`).join("")}</div>`;
+
+  if(S.screen==="login") return "";
+  if(S.screen==="confirm"){
+    return `<div class="bar-bottom">
+      <button class="btn" data-tab="track">${t("followOrder")}</button>
+      <button class="btn ghost" style="margin-top:9px" data-tab="home">${t("backHome")}</button>
+    </div>`;
+  }
+  if(S.screen==="product"){
+    const p = PRODUCTS.find(x=>x.id===S.product);
+    const w = S.unit==="kg" ? S.qty : S.qty*(p.avg||(S.unit==="caisse"?10:1));
+    return `<div class="bar-bottom">
+      <div class="sum"><span>${t("estAmount")}</span><b>${S.unit==="kg"?"":"≈ "}${num(fmt(w*p.p))} ${t("currency")}</b></div>
+      <button class="btn" data-add="1">${t("addToCart")}</button>
+    </div>`+nav;
+  }
+  if(S.screen==="cart" && S.cart.length){
+    const total = cartTotal();
+    return `<div class="bar-bottom">
+      <div class="sum"><span>${t("estTotal")}</span><b>${num(fmt(total))} ${t("currency")}</b></div>
+      <button class="btn" ${total<MIN_ORDER?"disabled":""} data-tab="delivery">${t("chooseSlot")}</button>
+    </div>`+nav;
+  }
+  if(S.screen==="delivery"){
+    return `<div class="bar-bottom">
+      <div class="sum"><span>${t("estTotal")}</span><b>${num(fmt(cartTotal()))} ${t("currency")}</b></div>
+      <button class="btn" ${S.slot?"":"disabled"} data-validate="1">${t("validate")}</button>
+    </div>`+nav;
+  }
+  return nav;
+}
+
+/* ===================== rendu ===================== */
+function render(){
+  const v = {login:viewLogin,home:viewHome,catalog:viewCatalog,product:viewProduct,cart:viewCart,
+             delivery:viewDelivery,confirm:viewConfirm,track:viewTrack,orders:viewOrders,account:viewAccount}[S.screen];
+  const view = document.getElementById("view");
+  view.innerHTML = v();
+  view.scrollTop = 0;
+  document.getElementById("bottom").innerHTML = bottomBar();
+  document.getElementById("statusDate").textContent = t("statusDate");
+  renderRail();
+}
+function renderRail(){
+  document.getElementById("railTag").textContent = t("railTag");
+  document.getElementById("railTitle").textContent = t("railTitle");
+  document.getElementById("railLead").textContent = t("railLead");
+  document.getElementById("railFoot").innerHTML = t("railFoot");
+  document.getElementById("themeBtn").textContent = t("theme");
+  document.getElementById("screenList").innerHTML = t("screens").map(([k,l],i)=>`
+    <button data-screen="${k}" aria-current="${S.screen===k}"><i>${String(i+1).padStart(2,"0")}</i><b>${l}</b></button>`).join("");
+  const cur = t("screens").find(s=>s[0]===S.screen);
+  document.getElementById("screenNote").innerHTML = cur?`<b>${cur[1]}</b>${cur[2]}`:"";
+  document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.lang===LANG));
+}
+function goScreen(k){ if(k==="product"&&!S.product) k="catalog"; S.screen=k; render(); }
+function openProduct(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  S.product=id; S.unit=unitsOf(p)[0]; S.qty=S.unit==="kg"?5:1; S.note="";
+  goScreen("product");
+}
+function reorder(){
+  S.cart=[{id:1,unit:"piece",qty:6,note:LANG==="ar"?"مقطّع إلى 8":"découpé en 8"},
+          {id:6,unit:"kg",qty:8,note:""},{id:10,unit:"kg",qty:4,note:""}];
+  goScreen("cart");
+}
+
+document.addEventListener("click", e=>{
+  const t2 = e.target.closest("[data-lang],[data-screen],[data-tab],[data-go],[data-product],[data-filter],[data-unit],[data-qty],[data-add],[data-remove],[data-slot],[data-validate],[data-back],[data-weigh],[data-reorder]");
+  if(!t2) return;
+  e.preventDefault();
+  const d = t2.dataset;
+
+  if(d.lang){
+    LANG = d.lang;
+    document.documentElement.lang = LANG;
+    document.documentElement.dir = LANG==="ar" ? "rtl" : "ltr";
+    S.cart = S.cart.map(l=>({...l, note:l.note?(LANG==="ar"?"مقطّع إلى 8":"découpé en 8"):""}));
+    return render();
+  }
+  if(d.screen){
+    const k = d.screen;
+    if(k==="product" && !S.product){ S.product=1; S.unit="piece"; S.qty=2; }
+    if((k==="cart"||k==="delivery"||k==="confirm"||k==="track") && !S.cart.length) reorder();
+    if(k==="confirm" && !S.slot) S.slot="a";
+    return goScreen(k);
+  }
+  if(d.tab) return goScreen(d.tab);
+  if(d.go) return goScreen(d.go);
+  if(d.back) return goScreen(d.back);
+  if(d.product) return openProduct(+d.product);
+  if(d.reorder) return reorder();
+  if(d.filter){ S.filter=d.filter; return render(); }
+  if(d.unit){ S.note=document.getElementById("prep")?.value||S.note; S.unit=d.unit; S.qty=S.unit==="kg"?5:1; return render(); }
+  if(d.qty){ S.note=document.getElementById("prep")?.value||S.note; S.qty=Math.max(1,S.qty+(+d.qty)); return render(); }
+  if(d.add){ S.note=document.getElementById("prep")?.value||""; S.cart.push({id:S.product,unit:S.unit,qty:S.qty,note:S.note}); return goScreen("cart"); }
+  if(d.remove){ S.cart.splice(+d.remove,1); return render(); }
+  if(d.slot){ S.slot=d.slot; return render(); }
+  if(d.validate){ S.weighed=false; return goScreen("confirm"); }
+  if(d.weigh){ S.weighed=!S.weighed; return render(); }
+});
+
+document.addEventListener("input", e=>{
+  if(e.target.id==="q"){
+    S.search = e.target.value;
+    const pos = e.target.selectionStart;
+    render();
+    const n = document.getElementById("q");
+    if(n){ n.focus(); n.setSelectionRange(pos,pos); }
+  }
+});
+
+document.getElementById("themeBtn").addEventListener("click", ()=>{
+  const cur = document.documentElement.getAttribute("data-theme");
+  const dark = cur ? cur==="dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark?"light":"dark");
+});
+
+render();
+</script>
+</body>
+</html>
