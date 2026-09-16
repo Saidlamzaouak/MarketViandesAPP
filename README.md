@@ -1,7 +1,8 @@
 # MarketViandes — maquette de l'application client
 
 Prototype cliquable de l'application de commande de viande et volaille destinée aux
-clients de MarketViandes. Bilingue **français / darija marocaine (RTL)**. Tous les produits se vendent **au kilo**.
+clients de MarketViandes. Bilingue **français / darija marocaine (RTL)** — bouton de langue en haut de l'écran.
+Tous les produits se vendent **au kilo**.
 
 > Maquette de travail, non contractuelle. Données, prix et stocks fictifs.
 > Back-office cible : Odoo 16.

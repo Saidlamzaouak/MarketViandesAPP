@@ -42,29 +42,12 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 
-.bench{display:grid;grid-template-columns:330px minmax(0,1fr);min-height:100vh}
-.rail{background:var(--bench-2);border-inline-end:1px solid var(--line);padding:26px 24px 40px;display:flex;flex-direction:column;gap:20px}
-.brandmark{display:flex;align-items:baseline;gap:9px}
-.brandmark b{font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.02em}
-.brandmark span{font-size:12px;color:var(--muted)}
-.rail h1{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.25;margin:0;letter-spacing:-.02em;max-width:26ch}
-.rail p.lead{margin:0;color:var(--muted);font-size:13.5px;max-width:36ch}
-.langpick{display:flex;gap:7px}
-.langpick button{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px;font-size:13px;color:var(--muted);background:var(--panel)}
-.langpick button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink);font-weight:600}
-.screens{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.screens button{text-align:start;padding:10px 13px;background:var(--panel);font-size:13.5px;display:flex;align-items:center;gap:10px;color:var(--muted)}
-.screens button b{font-weight:500;color:var(--ink)}
-.screens button i{font-style:normal;font-size:11px;width:18px;color:var(--muted);font-variant-numeric:tabular-nums}
-.screens button[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
-.screens button[aria-current="true"] b,.screens button[aria-current="true"] i{color:var(--accent-ink)}
-.note{border-inline-start:3px solid var(--accent);padding:2px 0;padding-inline-start:13px;font-size:13px;color:var(--muted)}
-.note b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px;font-size:13.5px}
-.rail footer{margin-top:auto;font-size:11.5px;color:var(--muted);line-height:1.6}
-.themeToggle{align-self:flex-start;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;color:var(--muted);background:var(--panel)}
-.stage{display:grid;place-items:center;padding:40px 20px}
+.bench{display:block}
+.stage{display:grid;place-items:center;min-height:100vh;padding:26px 16px}
+.langbtn{border:1px solid var(--line);border-radius:999px;padding:3px 11px;font-size:11px;font-weight:600;color:var(--muted);background:var(--panel);line-height:1.6}
+.langbtn:hover{color:var(--ink);border-color:var(--ink)}
 
-.phone{width:392px;height:830px;max-height:calc(100vh - 80px);background:var(--panel);border-radius:34px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+.phone{width:392px;height:846px;max-height:calc(100vh - 52px);background:var(--panel);border-radius:34px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
 .status{display:flex;justify-content:space-between;align-items:center;padding:11px 20px 5px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto}
 .view{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain}
 .view::-webkit-scrollbar{width:0}
@@ -215,31 +198,16 @@ html[lang="ar"] .login .logo{letter-spacing:0}
 .num{direction:ltr;unicode-bidi:embed;display:inline-block}
 
 @media (max-width:900px){
-  .bench{grid-template-columns:1fr}
-  .rail{border-inline-end:0;border-bottom:1px solid var(--line)}
-  .stage{padding:22px 12px 40px}
-  .phone{width:100%;max-width:392px;height:760px}
+  .stage{padding:12px 10px 18px}
+  .phone{width:100%;max-width:392px;height:calc(100vh - 30px)}
 }
 </style>
 </head>
 <body>
 <div class="bench">
-  <aside class="rail">
-    <div class="brandmark"><b>MarketViandes</b><span id="railTag"></span></div>
-    <h1 id="railTitle"></h1>
-    <p class="lead" id="railLead"></p>
-    <div class="langpick">
-      <button data-lang="fr" aria-pressed="true">Français</button>
-      <button data-lang="ar" aria-pressed="false">العربية</button>
-    </div>
-    <div class="screens" id="screenList"></div>
-    <div class="note" id="screenNote"></div>
-    <button class="themeToggle" id="themeBtn"></button>
-    <footer id="railFoot"></footer>
-  </aside>
   <main class="stage">
     <div class="phone">
-      <div class="status"><span class="num">08:42</span><span id="statusDate"></span></div>
+      <div class="status"><span class="num">08:42</span><button class="langbtn" id="langBtn"></button></div>
       <div class="view" id="view"></div>
       <div id="bottom"></div>
     </div>
@@ -803,20 +771,7 @@ function render(){
   view.innerHTML = v();
   view.scrollTop = 0;
   document.getElementById("bottom").innerHTML = bottomBar();
-  document.getElementById("statusDate").textContent = t("statusDate");
-  renderRail();
-}
-function renderRail(){
-  document.getElementById("railTag").textContent = t("railTag");
-  document.getElementById("railTitle").textContent = t("railTitle");
-  document.getElementById("railLead").textContent = t("railLead");
-  document.getElementById("railFoot").innerHTML = t("railFoot");
-  document.getElementById("themeBtn").textContent = t("theme");
-  document.getElementById("screenList").innerHTML = t("screens").map(([k,l],i)=>`
-    <button data-screen="${k}" aria-current="${S.screen===k}"><i>${String(i+1).padStart(2,"0")}</i><b>${l}</b></button>`).join("");
-  const cur = t("screens").find(s=>s[0]===S.screen);
-  document.getElementById("screenNote").innerHTML = cur?`<b>${cur[1]}</b>${cur[2]}`:"";
-  document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.lang===LANG));
+  document.getElementById("langBtn").textContent = LANG==="fr" ? "العربية" : "Français";
 }
 function goScreen(k){ if(k==="product"&&!S.product) k="catalog"; S.screen=k; render(); }
 function openProduct(id){ S.product=id; S.qty=5; S.note=""; goScreen("product"); }
@@ -827,25 +782,11 @@ function reorder(){
 }
 
 document.addEventListener("click", e=>{
-  const el = e.target.closest("[data-lang],[data-screen],[data-tab],[data-go],[data-product],[data-filter],[data-qty],[data-setqty],[data-add],[data-remove],[data-slot],[data-validate],[data-back],[data-weigh],[data-reorder]");
+  const el = e.target.closest("[data-screen],[data-tab],[data-go],[data-product],[data-filter],[data-qty],[data-setqty],[data-add],[data-remove],[data-slot],[data-validate],[data-back],[data-weigh],[data-reorder]");
   if(!el) return;
   e.preventDefault();
   const d = el.dataset;
 
-  if(d.lang){
-    LANG = d.lang;
-    document.documentElement.lang = LANG;
-    document.documentElement.dir = LANG==="ar" ? "rtl" : "ltr";
-    S.cart = S.cart.map(l=>({...l, note:l.note?NOTE_CUT():""}));
-    return render();
-  }
-  if(d.screen){
-    const k = d.screen;
-    if(k==="product" && !S.product){ S.product=1; S.qty=9; }
-    if((k==="cart"||k==="delivery"||k==="confirm"||k==="track") && !S.cart.length) reorder();
-    if(k==="confirm" && !S.slot) S.slot="a";
-    return goScreen(k);
-  }
   if(d.tab) return goScreen(d.tab);
   if(d.go) return goScreen(d.go);
   if(d.back) return goScreen(d.back);
@@ -871,10 +812,12 @@ document.addEventListener("input", e=>{
   }
 });
 
-document.getElementById("themeBtn").addEventListener("click", ()=>{
-  const cur = document.documentElement.getAttribute("data-theme");
-  const dark = cur ? cur==="dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-  document.documentElement.setAttribute("data-theme", dark?"light":"dark");
+document.getElementById("langBtn").addEventListener("click", ()=>{
+  LANG = LANG==="fr" ? "ar" : "fr";
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANG==="ar" ? "rtl" : "ltr";
+  S.cart = S.cart.map(l=>({...l, note:l.note?NOTE_CUT():""}));
+  render();
 });
 
 render();
