@@ -1,7 +1,7 @@
 # MarketViandes — maquette de l'application client
 
 Prototype cliquable de l'application de commande de viande et volaille destinée aux
-clients de MarketViandes. Bilingue **français / arabe (RTL)**.
+clients de MarketViandes. Bilingue **français / darija marocaine (RTL)**. Tous les produits se vendent **au kilo**.
 
 > Maquette de travail, non contractuelle. Données, prix et stocks fictifs.
 > Back-office cible : Odoo 16.
@@ -76,8 +76,10 @@ Penser à ajouter le certificat TLS (Certbot) avant de communiquer l'adresse.
 
 - **Disponibilité du jour** : le client ne voit que ce qui a été publié le matin,
   avec l'heure de mise à jour et l'heure limite de commande.
-- **Poids variable** : commande à la pièce ou au kilo, montant annoncé comme estimatif,
-  puis montant définitif après pesée. Le bouton *Simuler la pesée* de l'écran de suivi
+- **Vente au kilo uniquement** : le client saisit un nombre de kilos, avec des raccourcis
+  5 / 10 / 20 kg. Le calibre moyen d'une pièce reste affiché à titre indicatif.
+- **Facturation au poids pesé** : le montant du panier est estimatif, le montant définitif
+  est calculé après pesée à l'atelier. Le bouton *Simuler la pesée* de l'écran de suivi
   sert à montrer ce basculement en réunion.
 - **Créneaux réels** : seuls les jours de tournée de la zone du client sont proposés.
 - **Encours et factures** : plafond autorisé, montant échu.
@@ -90,8 +92,9 @@ Tout est dans `index.html` :
 | À modifier | Où chercher dans le fichier |
 |---|---|
 | Couleurs de la marque | Bloc `:root{ … }` en haut du CSS, variables `--accent`, `--ink`, `--line` |
-| Textes français et arabes | Objet `DICT` au début du script |
-| Produits, prix, stocks | Tableau `PRODUCTS` |
+| Textes français et darija | Objet `DICT` au début du script |
+| Produits, prix, stocks (en kg) | Tableau `PRODUCTS` |
+| Raccourcis de quantité | Constante `QUICK_KG` |
 | Créneaux de livraison | Tableau `SLOTS` |
 | Minimum de commande | Constante `MIN_ORDER` |
 
